@@ -3,11 +3,11 @@ var router = express.Router();
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const _ = require('lodash');
-const auth = require('../middleware/auth');
-const MeetingTopic = require('../schemas/meetingTopic');
-const MeetingTopicDistribution = require('../schemas/meetingTopicDistribution');
-const admin = require('../middleware/admin');
-const User = require('../schemas/user');
+const auth = require('../../middleware/auth');
+const MeetingTopic = require('../../schemas/meetingTopic');
+const MeetingTopicDistribution = require('../../schemas/meetingTopicDistribution');
+const admin = require('../../middleware/admin');
+const User = require('../../schemas/user');
 //----for validating the meeting creating---//
 function validateCreateMeeting(meeting) {
 

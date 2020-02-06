@@ -4,10 +4,10 @@ const Joi = require('joi');
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const auth = require('../middleware/auth');
-const QuestionPaper = require('../schemas/questionPaper');
+const auth = require('../../middleware/auth');
+const QuestionPaper = require('../../schemas/questionPaper');
 const multer = require('multer');
-const User = require('../schemas/user');
+const User = require('../../schemas/user');
 var time = '';
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

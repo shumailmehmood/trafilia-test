@@ -3,9 +3,9 @@ var router = express.Router();
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const _ = require('lodash');
-const auth = require('../middleware/auth');
-const Leave = require('../schemas/Leave');
-const admin = require('../middleware/admin');
+const auth = require('../../middleware/auth');
+const Leave = require('../../schemas/Leave');
+const admin = require('../../middleware/admin');
 //----for validating the meeting creating---//
 function validateCreateLeave(leave) {
 

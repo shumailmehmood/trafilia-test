@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose');
-const auth = require('../middleware/auth');
-const MeetingTopicDistribution = require('../schemas/meetingTopicDistribution');
-const MeetingTopic = require('../schemas/meetingTopic');
+const auth = require('../../middleware/auth');
+const MeetingTopicDistribution = require('../../schemas/meetingTopicDistribution');
+const MeetingTopic = require('../../schemas/meetingTopic');
 
 router.get('/notifications/:email', auth, async (req, res) => {
     let notifications = await MeetingTopicDistribution.find({ reciever_email: req.params.email }).sort({ _id: -1 }).limit(10);

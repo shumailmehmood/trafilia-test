@@ -3,10 +3,10 @@ var router = express.Router();
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const _ = require('lodash');
-const auth = require('../middleware/auth');
-const ForumTopic = require('../schemas/forumTopic');
-const admin = require('../middleware/admin');
-const User = require('../schemas/user');
+const auth = require('../../middleware/auth');
+const ForumTopic = require('../../schemas/forumTopic');
+const admin = require('../../middleware/admin');
+const User = require('../../schemas/user');
 //----for validating the meeting creating---//
 function validateCreateForum(forum) {
 

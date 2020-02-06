@@ -7,15 +7,8 @@ const config = require('config');
 var fs = require('fs');
 var cors = require('cors')
 var app = express();
+const appRoute = require('./App/v1/api/api');
 
-const usersRoute = require('./routes/users');
-const principalRoute = require('./routes/principal');
-const notificationsRoute = require('./routes/notifications');
-const paperRoute = require('./routes/questionPaper');
-const meetingRoute = require('./routes/meetingCreating');
-const leaveRoute = require('./routes/leave');
-const forumCreationRoute = require('./routes/forum_creation');
-const forumCommentRoute = require('./routes/forum_comments');
 
 
 const mongoose = require('mongoose');
@@ -30,37 +23,17 @@ mongoose.connect('mongodb://localhost/workflow',
 app.use(logger('common', {
   stream: fs.createWriteStream('./access.log')
 }));
-
 app.use('/uploads/', express.static('uploads'))
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-
-
-
-app.use('/users', usersRoute);
-app.use('/principal', principalRoute);
-app.use('/notifications', notificationsRoute);
-app.use('/meeting', meetingRoute);
-app.use('/paper', paperRoute);
-app.use('/leave', leaveRoute);
-app.use('/forum', forumCreationRoute);
-app.use('/comment', forumCommentRoute);
-
-
-
-
-
-
+app.use('/api/v1', appRoute);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
   res.send('404 Error caught');
 });
-
-
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development

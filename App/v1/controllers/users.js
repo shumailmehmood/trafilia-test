@@ -1,7 +1,7 @@
-const User = require('../schemas/user');
+const User = require('../../schemas/user');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
-const ValidatingMethods=require('../validatingMethods/users');
+const ValidatingMethods=require('../../validatingMethods/users');
 // function validateUserLogin(user) {
 //     const schema =
 //         {
@@ -22,4 +22,7 @@ exports.login = async (req, res, next) => {
     const token = user.generateToken();
     res.status(200).send(token);
 
+}
+exports.test = async (req, res, next) => {
+    res.send('Got It!!!!')
 }
