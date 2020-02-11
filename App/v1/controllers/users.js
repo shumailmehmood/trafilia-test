@@ -1,28 +1,31 @@
 const User = require('../../schemas/user');
-const Joi = require('joi');
 const bcrypt = require('bcrypt');
-const ValidatingMethods=require('../../validatingMethods/users');
-// function validateUserLogin(user) {
-//     const schema =
-//         {
-//             email: Joi.string().min(5).max(255).required().email(),
-//             password: Joi.string().min(5).max(1024).required()
-//         }
-//     return Joi.validate(user, schema);
-// }
-exports.login = async (req, res, next) => {
-    const { error } = ValidatingMethods.validateUserLogin(req.body);
+const { validateUserLogin } = require('../../validatingMethods/validate');
+exports.login = async (req, res) => {
+    const { error } = validateUserLogin(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-    let account_verification = await User.findOne({ $and: [{ email: req.body.email, isVerified: true }] });
-    if (!account_verification) return res.status(400).send('Your Account is not Verified');
-    let user = await User.findOne({ $and: [{ email: req.body.email, accountStatus: 'active' }] });
+    let user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(400).send('Invalid user');
     const compareUser = await bcrypt.compare(req.body.password, user.password);
     if (!compareUser) return res.status(400).send('Invalid user name and password');
+    req.locals.user = user;
     const token = user.generateToken();
     res.status(200).send(token);
+}
+exports.Register = async (req, res) => {
+    try {
+        const { error } = validateUserRegister(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
+        let user = await User.findOne({ email: req.body.email });
+        if (user) return res.status(400).send('User Already Exists!!');
+        user = new User(
+            _.pick(req.body, ['name', 'email', 'password'])
+        );
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+        user = await user.save();
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+}
 
-}
-exports.test = async (req, res, next) => {
-    res.send('Got It!!!!')
-}
