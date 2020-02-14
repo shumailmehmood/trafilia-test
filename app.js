@@ -10,13 +10,11 @@ var app = express();
 require('dotenv').config()
 const appRoute = require('./App/v1/api/api');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/workflow',
+mongoose.connect('mongodb://localhost/fivestar',
   { useNewUrlParser: true })
   .then(() => console.log('MongoDb successsFully Connected!!'))
   .catch(err => console.log('Errror in connecting mongodb', err));
-app.use(morgan('combined', {
-  stream: fs.createWriteStream('./access.log')
-}));
+app.use(morgan());
 app.use('/uploads/', express.static('uploads'))
 app.use(cors());
 app.use(express.json());

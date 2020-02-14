@@ -24,6 +24,8 @@ const userSchema = mongoose.Schema({
         default: false
     },
 
+},{
+    timestamps:true
 });
 userSchema.methods.generateToken = function () {
     const token = (jwt.sign({ id: this._id, name: this.name, email: this.email, isAdmin: this.isAdmin }, process.env.JWT_PVT_KEY));

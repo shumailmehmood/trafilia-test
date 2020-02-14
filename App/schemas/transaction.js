@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const ObjectId = Schema.Types.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 const transactionSchema = mongoose.Schema({
     uid: {
         item: {
