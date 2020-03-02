@@ -9,6 +9,10 @@ const itemSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    purchase_price: {
+        type: Number,
+        default: 0
+    },
     stock_in: {
         type: Number,
         default: 0

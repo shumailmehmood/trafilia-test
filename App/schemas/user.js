@@ -4,18 +4,12 @@ const userSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlength: 5,
-        maxlength: 50
     },
-    email: {
+    vehicle_no: {
         type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 255
     },
     password: {
-        type: String,
-        required: true,
+        type: String,       
         minlength: 5,
         maxlength: 1024
     },
@@ -24,8 +18,8 @@ const userSchema = mongoose.Schema({
         default: false
     },
 
-},{
-    timestamps:true
+}, {
+    timestamps: true
 });
 userSchema.methods.generateToken = function () {
     const token = (jwt.sign({ id: this._id, name: this.name, email: this.email, isAdmin: this.isAdmin }, process.env.JWT_PVT_KEY));

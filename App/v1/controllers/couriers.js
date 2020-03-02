@@ -1,5 +1,7 @@
 const Courier = require('../../schemas/courier');
 const { validate_courier_reg } = require('../../validatingMethods/validate')
+const { id_convertor } = require('../../misc/functions')
+const moment = require('moment')
 exports.courierReg = async (req, res) => {
    try {
       const { error } = validate_courier_reg(req.body);
@@ -21,7 +23,7 @@ exports.getCourier = async (req, res) => {
       const { id, page, limit } = req.query;
       page = page ? +page : 1;
       limit = limit ? +limit : 10;
-      let query={};     
+      let query = {};
       let data = await Courier.aggregate([
          { $match: query },
          {
@@ -41,4 +43,14 @@ exports.getCourier = async (req, res) => {
       return res.send(data[0])
    } catch (err) { return res.status(400).send(err.message); }
 }
-
+exports.courierSendGet = async (req, res) => {
+   try {
+      const { id } = req.params;
+      const { from } = req.query;
+      let query = {};
+      if (id) query['uid.item'] = id_convertor(id);
+      if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
+      let data = await Courier.findOne(query).lean()
+      return res.send(data);
+   } catch (err) { return res.status(400).send(err.message); }
+}

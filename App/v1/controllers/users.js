@@ -19,15 +19,15 @@ exports.login = async (req, res) => {
 }
 exports.Register = async (req, res, next) => {
     try {
-        const { error } = validateUserRegister(_.pick(req.body, ['name', 'email', 'password', 'isAdmin']));
+        const { error } = validateUserRegister(_.pick(req.body, ['name', 'vehicle_no', 'phoneNo']));
         if (error) return res.status(400).send(error.details[0].message);
-        let user = await User.findOne({ email: req.body.email });
+        let user = await User.findOne({ name: req.body.name });
         if (user) return res.status(400).send('User Already Exists!!');
         user = new User(
-            _.pick(req.body, ['name', 'email', 'password', 'isAdmin'])
+            _.pick(req.body, ['name', 'vehicle_no', 'phoneNo'])
         );
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
+        // const salt = await bcrypt.genSalt(10);
+        // user.password = await bcrypt.hash(user.password, salt);
         user = await user.save();
         req.user = user;
         next()
@@ -60,4 +60,24 @@ exports.getUsers = async (req, res) => {
         return res.status(400).send(err.message);
     }
 }
+exports.getAllUsers = async (req, res) => {
+    try {
+        let query = {};
+        let users = await User.aggregate([
+            { $match: query },
+            {
+                $lookup: {
+                    from: 'salaries',
+                    localField: '_id',
+                    foreignField: 'uid.item',
+                    as: 'Salary'
+                }
+            }
+        ])
+        res.send(users)
+    } catch (error) {
+        return res.status(400).send(err.message);
+    }
+}
+
 

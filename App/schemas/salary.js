@@ -5,6 +5,9 @@ const salarySchema = mongoose.Schema({
         item: {
             type: ObjectId,
             ref: 'User',
+        },
+        name:{
+            type:String
         }
     },
     salary_type: {

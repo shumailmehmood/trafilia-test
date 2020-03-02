@@ -37,3 +37,16 @@ exports.item_get_active = async (req, res) => {
    } catch (err) { return res.status(400).send(err.message); }
 
 }
+exports.getAllItems = async (req, res) => {
+   try {
+       let query = {};
+       let users = await Item.aggregate([
+           { $match: query },
+       ])
+       res.send(users)
+   } catch (error) {
+       return res.status(400).send(err.message);
+   }
+}
+
+

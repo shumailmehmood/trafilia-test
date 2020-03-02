@@ -5,9 +5,12 @@ exports.salaryReg = async (req, res) => {
     try {
         let data = {
             uid: {
-                item: id_convertor(req.user._id)
+                item: id_convertor(req.user._id),
+                name:req.user.name
             },
-            salary_type: req.body.salary_type,
+            salary_type: {
+                catagory: req.body.salary_type,               
+            },
         }
         let { error } = validateUserSalary(data);
         if (error) res.status(400).send(error.details[0].message);
