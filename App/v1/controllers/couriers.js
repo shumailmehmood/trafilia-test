@@ -14,16 +14,24 @@ exports.courierReg = async (req, res) => {
 exports.courierCheckOut = async (req, res) => {
    try {
       const { id } = req.params;
-      let data = await Courier.findByIdAndUpdate(id, req.body, { new: true }).lean()
+      let data = await Courier.update({ _id: id },
+         {
+            $set:
+            {
+               sendItems: req.body.sendItems,
+               returnItems: true
+            }
+         }).lean()
       return res.send(data);
    } catch (err) { return res.status(400).send(err.message); }
 }
 exports.getCourier = async (req, res) => {
    try {
-      const { id, page, limit } = req.query;
+      let { id, page, limit, from } = req.query;
       page = page ? +page : 1;
       limit = limit ? +limit : 10;
       let query = {};
+      if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
       let data = await Courier.aggregate([
          { $match: query },
          {
@@ -50,7 +58,7 @@ exports.courierSendGet = async (req, res) => {
       let query = {};
       if (id) query['uid.item'] = id_convertor(id);
       if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
-      let data = await Courier.findOne(query).lean()
-      return res.send(data);
+      let data = await Courier.find(query).sort({ "createdAt": -1 }).lean()
+      return res.send(data[0]);
    } catch (err) { return res.status(400).send(err.message); }
 }

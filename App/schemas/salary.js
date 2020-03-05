@@ -10,6 +10,9 @@ const salarySchema = mongoose.Schema({
             type:String
         }
     },
+    saleOf:{
+
+    },
     salary_type: {
         catagory: {
             type: String,

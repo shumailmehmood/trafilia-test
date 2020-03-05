@@ -15,10 +15,11 @@ router.post('/transaction/:id', Transaction.transactionPost, SalaryController.sa
 router.get('/get_all_users', UsersController.getAllUsers);
 router.get('/get_all_items', Item.getAllItems);
 router.get('/get_today_courier/:id', Courier.courierSendGet);
+router.get('/get_courier', Courier.getCourier);
 router.get('/get', (req, res) => {
     res.send('Welcome!!');
 })
 //-----------------PUT REQ ----------------------------//
-router.put('/checkout',Courier.courierCheckOut)
+router.put('/checkout/:id',Courier.courierCheckOut)
 module.exports = router;
 

@@ -36,31 +36,17 @@ const courierSchema = mongoose.Schema({
         purchase_price: {
             type: Number,
             require: true
-        }
+        },
+        return_count:{
+            type: Number,          
+        },
+
     }],
-    returnItems: [{
-        item_id: {
-            type: ObjectId,
-            required: true
-        },
-        item_name: {
-            type: String,
-            required: true
-        },
-        count: {
-            type: Number,
-            require: true
-        },
-        sale_price: {
-            type: Number,
-            require: true
-        },
-        purchase_price: {
-            type: Number,
-            require: true
-        }
-    }],
-    
+    returnItems: {
+        type: Boolean,
+        default: false
+    }
+
 },
     { timestamps: true })
 module.exports = mongoose.model('Courier', courierSchema);
