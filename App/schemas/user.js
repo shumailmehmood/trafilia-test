@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
         type: String,
     },
     password: {
-        type: String,       
+        type: String,
         minlength: 5,
         maxlength: 1024
     },
@@ -17,6 +17,16 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
+    salary_type: {
+        catagory: {
+            type: String,
+            enum: ['base', 'percent']
+        },
+        amount: {
+            type: Number,
+            default: 0
+        }
+    }
 
 }, {
     timestamps: true

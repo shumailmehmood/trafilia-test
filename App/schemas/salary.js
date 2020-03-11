@@ -6,24 +6,22 @@ const salarySchema = mongoose.Schema({
             type: ObjectId,
             ref: 'User',
         },
-        name:{
-            type:String
+        name: {
+            type: String
         }
     },
-    saleOf:{
-
+    amount: {
+        type: Number,
+        default: 0
     },
-    salary_type: {
-        catagory: {
-            type: String,
-            enum: ['base', 'percent']
-        },
-        amount: {
-            type: Number,
-            default: 0
-        }
-    },   
-    upto_current_month_remaining: {
+    recieved: {
+        type: Boolean,
+        default: false
+    },
+    salaryMonth: {
+        type: String
+    },
+    remaining: {
         type: Number,
         default: 0
     }
