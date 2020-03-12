@@ -11,18 +11,28 @@ exports.courierReg = async (req, res) => {
       return res.send(data);
    } catch (err) { return res.status(400).send(err.message); }
 }
-exports.courierCheckOut = async (req, res) => {
+exports.courierCheckOut = async (req, res, next) => {
    try {
       const { id } = req.params;
-      let data = await Courier.update({ _id: id },
+      const { sendItems, grandTotal, commission, commissionAmount, recieveAmount, uid } = req.body;
+      await Courier.update({ _id: id },
          {
             $set:
             {
-               sendItems: req.body.sendItems,
-               returnItems: true
+               sendItems: sendItems,
+               returnItems: true,
+               grandTotal: grandTotal,
+               commissionPer: commission,
+               commissionedAmount: commissionAmount
             }
          }).lean()
-      return res.send(data);
+      req['locals'] = {
+         recieveAmount,        
+         uid,
+         courierId: id,
+         reserveAmount: +commissionAmount - +recieveAmount
+      }
+      next()
    } catch (err) { return res.status(400).send(err.message); }
 }
 exports.getCourier = async (req, res) => {

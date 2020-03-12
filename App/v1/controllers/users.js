@@ -1,6 +1,8 @@
 const User = require('../../schemas/user');
 const bcrypt = require('bcrypt');
 const _ = require('lodash')
+const constants = require('../../misc/constants')
+const { id_convertor } = require('../../misc/functions')
 const { validateUserLogin, validateUserRegister } = require('../../validatingMethods/validate');
 exports.login = async (req, res) => {
     try {
@@ -17,7 +19,7 @@ exports.login = async (req, res) => {
         return res.status(400).send(err.message);
     }
 }
-exports.Register = async (req, res, next) => {
+exports.Register = async (req, res) => {
     try {
         const { error } = validateUserRegister(_.pick(req.body, ['name', 'vehicle_no', 'phoneNo']));
         if (error) return res.status(400).send(error.details[0].message);
@@ -28,9 +30,12 @@ exports.Register = async (req, res, next) => {
         );
         // const salt = await bcrypt.genSalt(10);
         // user.password = await bcrypt.hash(user.password, salt);
+        user.salary_type = {
+            catagory: req.body.salary_type,
+            amount: req.body.amount
+        }
         user = await user.save();
-        req.user = user;
-        next()
+        return res.send(user)
     } catch (err) {
         return res.status(400).send(err.message);
     }
@@ -77,6 +82,30 @@ exports.getAllUsers = async (req, res) => {
         res.send(users)
     } catch (error) {
         return res.status(400).send(err.message);
+    }
+}
+exports.updateUserSalary = async (req, res) => {
+    try {
+        const { uid: { item }, reserveAmount } = req.locals;
+        const { uid } = req.query;
+        const { pay } = req.body
+        let query = {};
+        if (item || uid) query['_id'] = id_convertor(item)
+        let data = {}
+        let response = await User.findOne(query).select('remainingAmount').lean();
+        if (uid) {
+            if (+response.remainingAmount < +pay) {
+                return res.status(400).send('Your requsted amount is greater than current amount!')
+            } else {
+                data.remainingAmount = +response.remainingAmount - +pay
+            }
+        } else {
+            data.remainingAmount = +response.remainingAmount + +reserveAmount
+        }
+        await User.update(query, data).lean();
+        res.send(constants.UPDATED_SUCCESS);
+    } catch (error) {
+        return res.status(400).send(error.message)
     }
 }
 

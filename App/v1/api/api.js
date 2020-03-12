@@ -20,6 +20,6 @@ router.get('/get', (req, res) => {
     res.send('Welcome!!');
 })
 //-----------------PUT REQ ----------------------------//
-router.put('/checkout/:id',Courier.courierCheckOut)
+router.put('/checkout/:id', Courier.courierCheckOut, SalaryController.transactionPost, UsersController.updateUserSalary)
 module.exports = router;
 

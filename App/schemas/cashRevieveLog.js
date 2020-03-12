@@ -10,14 +10,14 @@ const cashSchema = mongoose.Schema({
             type: String
         }
     },
+    courierid: {
+        type: ObjectId,
+        ref: 'Courier'
+    },
     amount: {
         type: Number,
         default: 0
     },
-    remaining: {
-        type: Number,
-        default: 0
-    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Cash', cashSchema);

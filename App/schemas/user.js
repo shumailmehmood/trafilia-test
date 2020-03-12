@@ -24,8 +24,13 @@ const userSchema = mongoose.Schema({
         },
         amount: {
             type: Number,
-            default: 0
+            default: 0,
+            required: true
         }
+    },
+    remainingAmount: {
+        type: Number,
+        default: 0
     }
 
 }, {

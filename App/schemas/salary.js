@@ -14,6 +14,10 @@ const salarySchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    addToRemaining: {
+        type: Boolean,
+        default: false
+    },
     recieved: {
         type: Boolean,
         default: false

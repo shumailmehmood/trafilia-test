@@ -37,15 +37,29 @@ const courierSchema = mongoose.Schema({
             type: Number,
             require: true
         },
-        return_count:{
-            type: Number,          
+        return_count: {
+            type: Number,
+            default:0
         },
 
     }],
-    returnItems: {
+    return: {
         type: Boolean,
         default: false
+    },
+    grandTotal: {
+        type: Number,
+        default: 0
+    },
+    commissionPer: {
+        type: Number,
+        default: 0
+    },
+    commissionedAmount: {
+        type: Number,
+        default: 0
     }
+
 
 },
     { timestamps: true })
