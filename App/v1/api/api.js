@@ -1,7 +1,25 @@
 var express = require('express');
 var router = express.Router();
 const UsersController = require('../controllers/users');
-router.post('/login',UsersController.login );
-router.get('/get',UsersController.test)
+const SalaryController = require('../controllers/salary');
+const Transaction = require("../controllers/transaction");
+const Courier = require("../controllers/couriers")
+const Item = require('../controllers/items')
+//-----------------POST Requests------------------//
+router.post('/login', UsersController.login);
+router.post('/register', UsersController.Register, SalaryController.salaryReg);
+router.post('/itemReg', Item.items_register);
+router.post('/sendCourier', Courier.courierReg);
+router.post('/transaction/:id', Transaction.transactionPost, SalaryController.salaryUpdate);
+//-----------------GET Requests------------------//
+router.get('/get_all_users', UsersController.getAllUsers);
+router.get('/get_all_items', Item.getAllItems);
+router.get('/get_today_courier/:id', Courier.courierSendGet);
+router.get('/get_courier', Courier.getCourier);
+router.get('/get', (req, res) => {
+    res.send('Welcome!!');
+})
+//-----------------PUT REQ ----------------------------//
+router.put('/checkout/:id',Courier.courierCheckOut)
 module.exports = router;
 
