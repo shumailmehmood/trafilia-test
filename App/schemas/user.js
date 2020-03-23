@@ -1,87 +1,43 @@
 const mongoose = require('mongoose');
-const Joi = require('joi');
 const jwt = require('jsonwebtoken');
-
 const userSchema = mongoose.Schema({
-
     name: {
         type: String,
         required: true,
-        minlength: 5,
-        maxlength: 50
-    }
-    ,
-    file_name: {
-        type: String,
-    
-        default:''
     },
-    file_path: {
+    vehicle_no: {
         type: String,
-       
-        default:''
-    },
-    email: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 255
-    }
-    ,
-    designation: {
-        type: String,
-        required: true
-    },
-    gender: {
-        type: String,
-        required: true
-    },
-    experience: {
-        type: String,
-        required: true
-    },
-    salary: {
-        type: String,
-        required: true
-    },
-    timeIn:
-    {
-        type: String,
-        required: true
-    },
-    timeOut:
-    {
-        type: String,
-        required: true
     },
     password: {
         type: String,
-        required: true,
         minlength: 5,
         maxlength: 1024
-    }
-    ,
-    isAdmin: Boolean,
-    accountStatus:
-    {
-        type: String,
-        required: true,
-        default: 'deactive'
-
     },
-    isVerified: {
+    isAdmin: {
         type: Boolean,
-        required: true,
         default: false
     },
-    secretToken:
-    {
-        type: String,
+    salary_type: {
+        catagory: {
+            type: String,
+            enum: ['base', 'percent']
+        },
+        amount: {
+            type: Number,
+            default: 0,
+            required: true
+        }
+    },
+    remainingAmount: {
+        type: Number,
+        default: 0
     }
-});
 
+}, {
+    timestamps: true
+});
 userSchema.methods.generateToken = function () {
-    const token = (jwt.sign({ id: this._id, name: this.name, designation: this.designation, email: this.email, isAdmin: this.isAdmin }, ('jwtPrivateKey')));
+    const token = (jwt.sign({ id: this._id, name: this.name, email: this.email, isAdmin: this.isAdmin }, process.env.JWT_PVT_KEY));
     return token;
 }
 module.exports = mongoose.model('User', userSchema);
