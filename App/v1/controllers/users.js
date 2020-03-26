@@ -68,6 +68,7 @@ exports.getUsers = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
     try {
         let query = {};
+        query['salary_type.catagory']="percent"
         let users = await User.aggregate([
             { $match: query },
             {

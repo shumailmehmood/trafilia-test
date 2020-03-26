@@ -14,21 +14,25 @@ exports.courierReg = async (req, res) => {
 exports.courierCheckOut = async (req, res, next) => {
    try {
       const { id } = req.params;
-      const { sendItems, grandTotal, commission, commissionAmount, recieveAmount, uid } = req.body;
+      const { sendItems, grandTotal, commission, commissionAmount, recieveAmount, item, name, vehicle_no } = req.body;
       await Courier.update({ _id: id },
          {
             $set:
             {
                sendItems: sendItems,
-               returnItems: true,
+               return: true,
                grandTotal: grandTotal,
                commissionPer: commission,
                commissionedAmount: commissionAmount
             }
          }).lean()
       req['locals'] = {
-         recieveAmount,        
-         uid,
+         recieveAmount,
+         uid: {
+            item: item,
+            name: name,
+            vehical_no: vehicle_no,
+         },
          courierId: id,
          reserveAmount: +commissionAmount - +recieveAmount
       }
@@ -41,24 +45,28 @@ exports.getCourier = async (req, res) => {
       page = page ? +page : 1;
       limit = limit ? +limit : 10;
       let query = {};
+      // if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
       if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
-      let data = await Courier.aggregate([
-         { $match: query },
-         {
-            $facet: {
-               metadata: [{ $count: "total_items" },
-               {
-                  $addFields: {
-                     page: page,
-                     limit: limit,
-                     pages: { $ceil: { $divide: ["$total_items", limit] } }
-                  }
-               }],
-               data: [{ $skip: (page * limit - limit) }, { $limit: limit }]
-            }
-         }
-      ]);
-      return res.send(data[0])
+    let data=await Courier.find(query).lean();
+    let count=await Courier.find(query).count().lean();
+      // let data = await Courier.aggregate([
+      //    { $match: query },
+      //    // {
+      //    //    $facet: {
+      //    //       metadata: [{ $count: "total_items" },
+      //    //       {
+      //    //          $addFields: {
+      //    //             page: page,
+      //    //             limit: limit,
+      //    //             pages: { $ceil: { $divide: ["$total_items", limit] } }
+      //    //          }
+      //    //       }],
+      //    //       data: [{ $skip: (page * limit - limit) }, { $limit: limit }]
+      //    //    }
+      //    // }
+      // ]);
+      
+      return res.send(data)
    } catch (err) { return res.status(400).send(err.message); }
 }
 exports.courierSendGet = async (req, res) => {
@@ -68,6 +76,7 @@ exports.courierSendGet = async (req, res) => {
       let query = {};
       if (id) query['uid.item'] = id_convertor(id);
       if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
+      query['return']=false
       let data = await Courier.find(query).sort({ "createdAt": -1 }).lean()
       return res.send(data[0]);
    } catch (err) { return res.status(400).send(err.message); }
