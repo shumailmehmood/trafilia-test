@@ -3,6 +3,8 @@ const { validateUserSalary } = require("../../validatingMethods/validate");
 const { id_convertor } = require("../../misc/functions");
 const CashLog = require("../../schemas/cashRevieveLog");
 const constants = require("../../misc/constants");
+const moment = require('moment')
+
 exports.salaryReg = async (req, res) => {
     try {
         let data = {
@@ -47,7 +49,7 @@ exports.salaryUpdate = async (req, res, next) => {
 }
 exports.transactionPost = async (req, res, next) => {
     try {
-        let { recieveAmount, uid, courierId,reserveAmount } = req.locals;
+        let { recieveAmount, uid, courierId, reserveAmount } = req.locals;
         let data = {
             uid: uid,
             courierid: courierId,
@@ -61,3 +63,59 @@ exports.transactionPost = async (req, res, next) => {
         return res.status(400).send(err.message);
     }
 }
+exports.Payment = async (req, res, next) => {
+    try {
+        req.body.uid.item = id_convertor(req.body.uid.item);
+        req.body.courierid = null;
+        let body = new CashLog(req.body);
+        await body.save();
+        req.locals = {
+            uid: req.body.uid,
+            reserveAmount: req.body.amount,
+            check: true
+        }
+        next();
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+}
+exports.PaymentGet = async (req, res, next) => {
+    try {
+        let { name, page, limit, from } = req.query;
+        page = page ? +page : 1;
+        limit = limit ? +limit : 10;
+        let query = {};
+        if (from) query["createdAt"] = { $gte: moment(from).startOf('day').toISOString(), $lte: moment(from).endOf('day').toISOString() }
+        if (name) query["uid.name"] = new RegExp(name, "i");
+        let data=await CashLog.find(query).lean();
+        let count=await CashLog.find(query).count().lean();
+        // let data = await CashLog.aggregate([
+        //     { $match: query },
+        //     {
+        //         $facet: {
+        //             metadata: [{ $count: "total_items" },
+        //             {
+        //                 $addFields: {
+        //                     page: page,
+        //                     limit: limit,
+        //                     pages: { $ceil: { $divide: ["$total_items", limit] } }
+        //                 }
+        //             }],
+        //             data: [{ $skip: (page * limit - limit) }, { $limit: limit }]
+        //         }
+        //     }
+        // ]);
+       
+data={
+    data:data,
+    pages:Math.ceil(count / limit),
+    limit:limit,
+    page:page
+}
+        return res.send(data)
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+}
+
+

@@ -68,7 +68,7 @@ exports.getUsers = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
     try {
         let query = {};
-        query['salary_type.catagory']="percent"
+        // query['salary_type.catagory'] = "percent"
         let users = await User.aggregate([
             { $match: query },
             {
@@ -87,18 +87,18 @@ exports.getAllUsers = async (req, res) => {
 }
 exports.updateUserSalary = async (req, res) => {
     try {
-        const { uid: { item }, reserveAmount } = req.locals;
-        const { uid } = req.query;
-        const { pay } = req.body
+        const { uid: { item }, reserveAmount, check } = req.locals;
+
+
         let query = {};
-        if (item || uid) query['_id'] = id_convertor(item)
+        if (item) query['_id'] = id_convertor(item)
         let data = {}
         let response = await User.findOne(query).select('remainingAmount').lean();
-        if (uid) {
-            if (+response.remainingAmount < +pay) {
+        if (check) {
+            if (+response.remainingAmount < +reserveAmount) {
                 return res.status(400).send('Your requsted amount is greater than current amount!')
             } else {
-                data.remainingAmount = +response.remainingAmount - +pay
+                data.remainingAmount = +response.remainingAmount - +reserveAmount
             }
         } else {
             data.remainingAmount = +response.remainingAmount + +reserveAmount
@@ -109,5 +109,15 @@ exports.updateUserSalary = async (req, res) => {
         return res.status(400).send(error.message)
     }
 }
-
+exports.getTotalRemainingAmount = async (req, res) => {
+    try {
+        let { id } = req.query;
+        let amount
+        if(id)
+        amount = await User.findById(id).select('remainingAmount').lean();
+        return res.send(amount);
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+}
 

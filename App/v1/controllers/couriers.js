@@ -4,6 +4,7 @@ const { id_convertor } = require('../../misc/functions')
 const moment = require('moment')
 exports.courierReg = async (req, res) => {
    try {
+      
       const { error } = validate_courier_reg(req.body);
       if (error) return res.status(400).send(error.details[0].message);
       let data = new Courier(req.body);

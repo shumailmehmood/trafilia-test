@@ -10,8 +10,8 @@ var app = express();
 require('dotenv').config()
 const appRoute = require('./App/v1/api/api');
 const mongoose = require('mongoose');
-let URL="mongodb+srv://shumail:iloveyou_786@margallah-gxjmf.mongodb.net/industry?retryWrites=true&w=majority"
-mongoose.connect( process.env.URL || 'mongodb://localhost/fivestar',
+let URL1="mongodb+srv://shumail:iloveyou_786@margallah-gxjmf.mongodb.net/industry?retryWrites=true&w=majority"
+mongoose.connect( process.env.URL1 || 'mongodb://localhost/fivestar',
   { useNewUrlParser: true })
   .then(() => console.log('MongoDb successsFully Connected!!'))
   .catch(err => console.log('Errror in connecting mongodb', err));
