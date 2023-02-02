@@ -1,8 +1,5 @@
 const Cart = require("../../schemas/cart");
-const {
-  createShippingNumber,
-  calculateDiscount,
-} = require("../../misc/functions");
+const { createShippingNumber } = require("../../misc/functions");
 const Repository = require("../../repository/index");
 
 exports.create = async (req, res) => {
@@ -14,11 +11,12 @@ exports.create = async (req, res) => {
     if (!cart) return res.status(400).send("Cart Not Found");
     let payload = {
       cartID: cart._id,
+      orderId: createShippingNumber(),
       total: {
-        shipping: createShippingNumber(),
+        shipping: cart.shippment,
         product: cart.products.length,
-        discounts: calculateDiscount(cart),
-        order: createShippingNumber(),
+        discounts: cart.discount,
+        order: cart.order,
       },
     };
     await Repository.cart.update(

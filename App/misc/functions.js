@@ -31,7 +31,7 @@ module.exports = class utils {
 
   static createShippingNumber() {
     let timestamp = Date.now().toString();
-    return timestamp.substr(timestamp.length - 5);
+    return `O-${timestamp.substr(timestamp.length - 5)}`;
   }
   static countObjectsByProperty(arr, property) {
     const frequencyMap = {};

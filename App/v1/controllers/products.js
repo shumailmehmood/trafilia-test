@@ -1,6 +1,4 @@
-const Product = require("../../schemas/product");
 const _ = require("lodash");
-const { id_convertor } = require("../../misc/functions");
 const { validateProduct } = require("../../validatingMethods/validate");
 const Repository = require("../../repository/product");
 exports.Register = async (req, res) => {

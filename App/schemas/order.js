@@ -7,6 +7,7 @@ let orderSchema = mongoose.Schema(
       ref: "Cart",
       required: true,
     },
+    orderId: String,
     total: {
       product: Number,
       discounts: Number,
