@@ -55,7 +55,7 @@ module.exports = class utils {
   static verifyPromoApplied(cart, key) {
     return _.findIndex(
       cart.products,
-      (e) => e.category === key && e.promo === false
+      (e) => e.category === key && e.promo === true
     );
   }
   static applyPromotions(mocks, cart) {
@@ -69,46 +69,41 @@ module.exports = class utils {
       check = utils.verifyPromoApplied(cart, key);
       switch (mock.type) {
         case "item":
-          if (check >= 0) {
+          if (check < 0) {
             if (value >= mock.criteria) {
-              index = _.findIndex(
-                cart.products,
-                (e) => e.category === key && e.promo === false
-              );
+              index = _.findIndex(cart.products, (e) => e.category === key);
               cart.products[index].quantity += mock.discount;
               cart.products[index].total_shippment =
                 cart.products[index].quantity * cart.products[index].shippment;
               cart = utils.updatePromo(cart, key);
             }
           }
+
           break;
         case "shippment":
-          if (check >= 0) {
-            if (value > mock.criteria) {
-              for (let i = 0; i < cart.products.length; i++) {
-                if (cart.products[i].category === key)
-                  cart.products[i].total_shippment = 0;
-              }
-
-              cart = utils.updatePromo(cart, key);
+          if (value > mock.criteria) {
+            for (let i = 0; i < cart.products.length; i++) {
+              if (cart.products[i].category === key)
+                cart.products[i].total_shippment = 0;
             }
+
+            cart = utils.updatePromo(cart, key);
           }
+
           break;
         case "percentage":
-          if (check >= 0) {
-            if (value > mock.criteria) {
-              for (let i = 0; i < cart.products.length; i++) {
-                if (
-                  cart.products[i].category === key &&
-                  cart.products[i].promo === false
-                ) {
-                  cart.products[i].total =
-                    cart.products[i].total -
-                    (cart.products[i].total * mock.discount) / 100;
-                }
+          if (value > mock.criteria) {
+            for (let i = 0; i < cart.products.length; i++) {
+              if (
+                cart.products[i].category === key &&
+                cart.products[i].promo === false
+              ) {
+                cart.products[i].total =
+                  cart.products[i].total -
+                  (cart.products[i].total * mock.discount) / 100;
               }
-              cart = utils.updatePromo(cart, key);
             }
+            cart = utils.updatePromo(cart, key);
           }
           break;
       }

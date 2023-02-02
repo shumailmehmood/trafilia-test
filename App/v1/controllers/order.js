@@ -1,5 +1,5 @@
 const Cart = require("../../schemas/cart");
-const { createShippingNumber } = require("../../misc/functions");
+const { createShippingNumber } = require("../../misc/utility");
 const Repository = require("../../repository/index");
 
 exports.create = async (req, res) => {
@@ -8,7 +8,12 @@ exports.create = async (req, res) => {
       userID: req.user.id,
       isCheckout: false,
     });
-    if (!cart) return res.status(400).send("Cart Not Found");
+    if (!cart)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Cart Not found",
+        data: cart || {},
+      });
     let payload = {
       cartID: cart._id,
       orderId: createShippingNumber(),
@@ -26,16 +31,32 @@ exports.create = async (req, res) => {
       },
       { isCheckout: true }
     );
-    return res.send(await Repository.order.create(payload));
+    return res.status(200).json({
+      type: "success",
+      message: "Order has been placed",
+      data: await Repository.order.create(payload),
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wront",
+      data: err,
+    });
   }
 };
 exports.get = async (req, res) => {
   try {
     let cart = await Cart.find({});
-    return res.send(cart);
+    return res.status(200).json({
+      type: "success",
+      message: "Data Fetch successfuly",
+      data: cart,
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wront",
+      data: err,
+    });
   }
 };

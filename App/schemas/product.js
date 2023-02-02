@@ -12,8 +12,9 @@ const productSchema = mongoose.Schema(
     category: {
       type: String,
       enum: ["coffee", "equipment", "accessories"],
+      require: true,
     },
-    shippment: Number,
+    shippment: { type: Number, require: true },
   },
   { timestamps: true }
 );

@@ -1,5 +1,3 @@
-const Cart = require("../../schemas/cart");
-
 const _ = require("lodash");
 const mongoose = require("mongoose");
 
@@ -10,7 +8,7 @@ const {
   applyPromotions,
   calculateShippmentTotal,
   calculateDiscount,
-} = require("../../misc/functions");
+} = require("../../misc/utility");
 const Mocks = require("../../misc/mocks/promotions");
 const { validateCart } = require("../../validatingMethods/validate");
 const Repository = require("../../repository/index");
@@ -19,14 +17,25 @@ exports.create = async (req, res) => {
   try {
     //at the same time they are send one product at a time.
     const { error } = validateCart(_.pick(req.body, ["productId", "quantity"]));
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Something went wrong",
+        data: error.details[0].message,
+      });
     let query = { userID: req.user.id, isCheckout: false };
+
     let cart = (await Repository.cart.findSpecific(query)) || {};
 
-    //fetch the promotions on the basis of productid
     let product = await Repository.product.findSpecific({
       _id: mongoose.Types.ObjectId(req.body.productId),
     });
+    if (!product)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "No Product found against id:" + req.body.productId,
+        data: product || {},
+      });
 
     if (Object.keys(cart).length) {
       const itemIndex = findItemIndex(
@@ -46,10 +55,6 @@ exports.create = async (req, res) => {
         cart.products[itemIndex].total = cart.products[itemIndex].promo
           ? cart.products[itemIndex].total + cart.products[itemIndex].price
           : cart.products[itemIndex].quantity * product.price;
-        // cart.products[itemIndex].total_shippment = cart.products[itemIndex]
-        //   .promo
-        //   ? cart.products[itemIndex].quantity + product.shippment
-        //   : cart.products[itemIndex].quantity * product.shippment;
       }
 
       cart = applyPromotions(Mocks.PROMOTIONS, cart);
@@ -62,7 +67,11 @@ exports.create = async (req, res) => {
         cart
       );
 
-      return res.send(await Repository.cart.findSpecific(query));
+      return res.status(200).json({
+        type: "success",
+        message: "Item Added",
+        data: await Repository.cart.findSpecific(query),
+      });
     }
 
     cart.products = [createPayload(req, product)];
@@ -72,17 +81,95 @@ exports.create = async (req, res) => {
     cart.order = cart.subTotal + cart.shippment;
     cart.discount = calculateDiscount(cart);
     cart.userID = req.user.id;
-
-    return res.status(200).send(await Repository.cart.createCart(cart));
+    if (!cart.userID)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "No user found. Login to continue",
+        data: err,
+      });
+    return res.status(200).json({
+      type: "success",
+      message: "Item Added",
+      data: await Repository.cart.createCart(cart),
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wront",
+      data: err,
+    });
   }
 };
 exports.get = async (req, res) => {
   try {
-    let cart = await Cart.find({});
-    return res.send(cart);
+    let cart = await Repository.cart.getAll();
+    return res.status(200).json({
+      type: "success",
+      message: "Data fetched successfully",
+      data: cart,
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wront",
+      data: err,
+    });
+  }
+};
+exports.getSpecific = async (req, res) => {
+  try {
+    let cart = await Repository.cart.findSpecific({
+      _id: mongoose.Types.ObjectId(req.params.id),
+    });
+    if (!cart)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Cart Not found",
+        data: cart || {},
+      });
+    return res.status(200).json({
+      type: "success",
+      message: "Cart fetched successfully",
+      data: cart,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wront",
+      data: err,
+    });
+  }
+};
+exports.remove = async (req, res) => {
+  try {
+    //at the same time they are send one product at a time.
+    let query = {
+      _id: mongoose.Types.ObjectId(req.params.id),
+    };
+
+    let cart = (await Repository.cart.findSpecific(query)) || {};
+
+    if (Object.keys(cart).length) {
+      cart = await Repository.cart.update(
+        { userID: req.user.id, isCheckout: false },
+        { isCheckout: true }
+      );
+      return res.status(200).json({
+        type: "success",
+        message: "Your Cart has been removed.",
+        data: {},
+      });
+    }
+    return res.status(400).json({
+      type: "Failed",
+      message: "Cart not Found",
+      data: cart,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wront",
+      data: err,
+    });
   }
 };

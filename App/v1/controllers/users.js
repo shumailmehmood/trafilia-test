@@ -11,16 +11,38 @@ exports.login = async (req, res) => {
     const { error } = validateUserLogin(
       _.pick(req.body, ["email", "password"])
     );
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Something went wrong",
+        data: error.details[0].message,
+      });
     let user = await Repository.findSpecific(_.pick(req.body, ["email"]));
-    if (!user) return res.status(400).send("Invalid user");
+    if (!user)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Invalid User",
+        data: req.body.email,
+      });
     const compareUser = await bcrypt.compare(req.body.password, user.password);
     if (!compareUser)
-      return res.status(400).send("Invalid user name and password");
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Invalid user name and password",
+        data: req.body.email,
+      });
     const token = user.generateToken();
-    res.send(token);
+    return res.status(200).json({
+      type: "Success",
+      message: "Logged In",
+      data: token,
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wrong",
+      data: err,
+    });
   }
 };
 exports.Register = async (req, res) => {
@@ -29,12 +51,22 @@ exports.Register = async (req, res) => {
       _.pick(req.body, ["name", "email", "password"])
     );
 
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "Something went wrong",
+        data: error.details[0].message,
+      });
 
     let user = await Repository.findSpecific({
-      email: _.pick(req.body, ["email"]),
+      email: _.pick(req.body, ["email"]).email,
     });
-    if (user) return res.status(400).send("User Already Exists!!");
+    if (user)
+      return res.status(400).json({
+        type: "Invalid",
+        message: "User Already Exists!!",
+        data: req.body.email,
+      });
 
     let payload = { ..._.pick(req.body, ["name", "email", "password"]) };
 
@@ -42,15 +74,31 @@ exports.Register = async (req, res) => {
 
     payload.password = await bcrypt.hash(payload.password, salt);
 
-    return res.send(await Repository.createUser(payload));
+    return res.status(200).json({
+      type: "Success",
+      message: "User Registered",
+      data: await Repository.createUser(payload),
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wrong",
+      data: err,
+    });
   }
 };
 exports.get = async (req, res) => {
   try {
-    return res.send(await Repository.getAll());
+    return res.status(200).json({
+      type: "Success",
+      message: "Data Fetched",
+      data: await Repository.getAll(),
+    });
   } catch (err) {
-    return res.status(400).send(err.message);
+    return res.status(400).json({
+      type: "Failed",
+      message: "Something went wrong",
+      data: err,
+    });
   }
 };

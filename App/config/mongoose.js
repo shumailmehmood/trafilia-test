@@ -6,7 +6,7 @@ module.exports = (app) => {
       useNewUrlParser: true,
       useFindAndModify: false,
     })
-    .then((res) => console.log("conneceted"))
+    .then((res) => console.log("Mongo DB connected Successfully"))
     .catch((err) => console.log(err));
   mongoose.Promise = global.Promise;
   process.on("SIGINT", cleanup);
