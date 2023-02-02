@@ -1,28 +1,23 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const UsersController = require('../controllers/users');
-const SalaryController = require('../controllers/salary');
-const Courier = require("../controllers/couriers")
-const Item = require('../controllers/items')
-//-----------------POST Requests------------------//
-router.post('/login', UsersController.login);
-router.post('/register', UsersController.Register, SalaryController.salaryReg);
-router.post('/itemReg', Item.items_register);
-router.post('/sendCourier', Courier.courierReg);
-router.post('/transaction',SalaryController.Payment,UsersController.updateUserSalary );
-//-----------------GET Requests------------------//
-router.get('/get_all_users', UsersController.getAllUsers);
-router.get('/get_all_items', Item.getAllItems);
-router.get('/get_today_courier/:id', Courier.courierSendGet);
-router.get('/get_courier', Courier.getCourier);
-router.get('/get_payment', SalaryController.PaymentGet);
-router.get('/get_remainingAmount', UsersController.getTotalRemainingAmount);
+const UsersController = require("../controllers/users");
+const ProductController = require("../controllers/products");
+const cartController = require("../controllers/cart");
+const orderController = require("../controllers/order");
 
-router.get('/get', (req, res) => {
-    res.send('Welcome!!');
-})
+const Auth = require("../../middleware/auth");
 
-//-----------------PUT REQ ----------------------------//
-router.put('/checkout/:id', Courier.courierCheckOut, SalaryController.transactionPost, UsersController.updateUserSalary)
+router.post("/login", UsersController.login);
+router.post("/register", UsersController.Register);
+router.get("/get/users", Auth, UsersController.get);
+
+router.post("/register/product", Auth, ProductController.Register);
+router.get("/get/products", ProductController.get);
+
+router.post("/create/cart", Auth, cartController.create);
+router.get("/get/cart", Auth, cartController.get);
+
+router.post("/create/order", Auth, orderController.create);
+router.get("/get/order", Auth, orderController.get);
+
 module.exports = router;
-

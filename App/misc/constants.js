@@ -1,1 +1,0 @@
-exports.UPDATED_SUCCESS="Updated SuccessFully"

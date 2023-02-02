@@ -1,73 +1,44 @@
-const Joi = require('joi');
+const Joi = require("joi");
+const product = require("../schemas/product");
 exports.validateUserLogin = (user) => {
-    const schema =
-    {
-        email: Joi.string().min(5).max(255).required().email(),
-        password: Joi.string().min(5).max(1024).required()
-    }
-    return Joi.validate(user, schema);
-}
+  const schema = {
+    email: Joi.string().min(5).max(255).required().email(),
+    password: Joi.string().min(5).max(1024).required(),
+  };
+  return Joi.validate(user, schema);
+};
 exports.validateUserRegister = (user) => {
-    const schema =
-    {
-        name: Joi.string().required(),
-        vehicle_no: Joi.string().required(),
-        phoneNo: Joi.string().required(),
-        // isAdmin: Joi.boolean()
-    }
-    return Joi.validate(user, schema);
-}
-exports.validateUserSalary = (details) => {
-    const schema =
-    {
-        uid: Joi.object().keys({
-            item: Joi.object().required(),
-            name: Joi.string()
-        }).required(),
-        salary_type: Joi.object().keys({
-            catagory: Joi.string().required(),
-            amount: Joi.number().integer()
-        }).required(),
-        // salary_type:Joi.string().required(),
-        upto_current_month_remaining: Joi.number().integer()
-    }
-    return Joi.validate(details, schema);
-}
-
-exports.validateTransaction = (details) => {
-    const schema = {
-        uid: Joi.object().keys({
-            item: Joi.object().required()
-        }),
-        amount_payed: Joi.number().integer()
-    }
-    return Joi.validate(details, schema)
-}
-exports.validate_item_reg = (details) => {
-    const schema = {
-        name: Joi.string().required(),
-        sale_price: Joi.number().integer(),
-        purchase_price: Joi.number().integer(),
-        stock_in: Joi.number().integer()
-    }
-    return Joi.validate(details, schema)
-}
-exports.validate_courier_reg = (details) => {
-    let service = Joi.object().keys({
-        item_id: Joi.required(),
-        count: Joi.number().required(),
-        sale_price: Joi.number().required(),
-        purchase_price: Joi.number().required(),
-        item_name: Joi.string()
-    })
-    const schema = {
-        uid: Joi.object().keys({
-            item: Joi.required(),
-            name: Joi.string(),
-            vehical_no: Joi.string(),
-        }),
-        sendItems: Joi.array().items(service).required(),
-        returnItems: Joi.array().items(service)
-    }
-    return Joi.validate(details, schema)
-}
+  const schema = {
+    name: Joi.string().required(),
+    email: Joi.string().min(5).max(255).required().email(),
+    password: Joi.string().min(5).max(1024).required(),
+  };
+  return Joi.validate(user, schema);
+};
+exports.validateProduct = (product) => {
+  const schema = {
+    name: Joi.string().required(),
+    price: Joi.number().required(),
+    category: Joi.any()
+      .valid(["coffee", "equipment", "accessories"])
+      .required(),
+  };
+  return Joi.validate(product, schema);
+};
+exports.validateCart = (cart) => {
+  const schema = {
+    quantity: Joi.number().required(),
+    productId: Joi.string().required(),
+  };
+  return Joi.validate(cart, schema);
+};
+exports.validatePromotions = (cart) => {
+  const schema = {
+    startDate: Joi.string().required(),
+    endDate: Joi.string().required(),
+    type: Joi.string().required(),
+    value: Joi.string().required(),
+    productId: Joi.string().required(),
+  };
+  return Joi.validate(cart, schema);
+};
